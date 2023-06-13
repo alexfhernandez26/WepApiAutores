@@ -9,6 +9,8 @@ namespace WepApiAutores
 
         
         public DbSet<Autor> Autors { get; set; }
+        public DbSet<Libros> Libros { get; set; }
+
 
     }
 }
