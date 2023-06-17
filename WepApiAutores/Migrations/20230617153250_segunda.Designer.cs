@@ -11,8 +11,8 @@ using WepApiAutores;
 namespace WepApiAutores.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230613035820_RelacionUnoAmuchosAutorLibros")]
-    partial class RelacionUnoAmuchosAutorLibros
+    [Migration("20230617153250_segunda")]
+    partial class segunda
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,6 @@ namespace WepApiAutores.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -49,33 +48,11 @@ namespace WepApiAutores.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Titulo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("autorId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("autorId");
-
                     b.ToTable("Libros");
-                });
-
-            modelBuilder.Entity("WepApiAutores.Entidades.Libros", b =>
-                {
-                    b.HasOne("WepApiAutores.Entidades.Autor", "Autor")
-                        .WithMany("Libros")
-                        .HasForeignKey("autorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Autor");
-                });
-
-            modelBuilder.Entity("WepApiAutores.Entidades.Autor", b =>
-                {
-                    b.Navigation("Libros");
                 });
 #pragma warning restore 612, 618
         }

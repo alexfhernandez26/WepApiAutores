@@ -6,9 +6,8 @@ namespace WepApiAutores.Entidades
     {
         public int Id { get; set; }
         public string Titulo { get; set; }
-        public int autorId { get; set; }
-    //    [JsonIgnore]
-        public Autor Autor { get; set; }
+
+        public List<Comentario> Comentarios { get; set; }
 
     }
 }

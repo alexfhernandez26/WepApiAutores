@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using WepApiAutores.Dtos;
 using WepApiAutores.Entidades;
 
 namespace WepApiAutores.Controllers
@@ -9,57 +13,54 @@ namespace WepApiAutores.Controllers
     public class LibrosController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        public LibrosController(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public LibrosController(ApplicationDbContext context, IMapper mapper)
         {
 
-            _context = context;
-
+            this._context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Libros>>> Get()
+        public async Task <ActionResult<List<LibroDto>>> Get()
         {
-            var dataLibro =  await _context.Libros.Include(x => x.Autor).ToListAsync();
+            var dataLibro =  await _context.Libros.ToListAsync();
 
             if (dataLibro == null)
             {
                 return BadRequest("No existe ningun libro");
             }
 
-            return Ok(dataLibro);
+            return _mapper.Map<List<LibroDto>>(dataLibro);
         }
-        //[HttpGet("id:int")]
-        //public async Task<ActionResult<Libros>> Get(int id)
-        //{
-        //    var dataLibro = await _context.Libros.Include(x => x.Autor).FirstOrDefaultAsync(x => x.Id == id);
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<LibroDto>> Get(int id)
+        {
+            var dataLibro = await _context.Libros.FirstOrDefaultAsync(x => x.Id == id);
 
-        //    if (dataLibro == null)
-        //    {
-        //        return BadRequest($"No existe ningun libro con el id {id}");
-        //    }
+            if (dataLibro == null)
+            {
+                return BadRequest($"No existe ningun libro con el id {id}");
+            }
 
-        //    return Ok(dataLibro);
-        //}
+            return _mapper.Map<LibroDto>(dataLibro);
+        }
 
-        //[HttpPost]
-        //public async Task<ActionResult> Post(Libros libros)
-        //{
-        //    var existeAutor = await _context.Autors.AnyAsync(x => x.Id == libros.autorId );
-        //    if (!existeAutor)
-        //    {
-        //        return NotFound($"No existe autor con el id {libros.autorId}");
-        //    }
-        //    var dataLibro = await _context.Libros.ToListAsync();
+        [HttpPost]
+        public async Task<ActionResult> Post(LibroCreacionDto librosCreacionDto)
+        {
+            //var existeAutor = await _context.Autors.AnyAsync(x => x.Id == libros.AutorId);
+            //if (!existeAutor)
+            //{
+            //    return NotFound($"No existe autor con el id {libros.AutorId}");
+            //}
 
-        //    if (libros == null)
-        //    {
-        //        return BadRequest("Debe insertar el libro");
-        //    }
+            var libros = _mapper.Map<Libros>(librosCreacionDto);
 
-        //    _context.Libros.Add(libros);
-        //    await _context.SaveChangesAsync();
+            _context.Add(libros);
+            await _context.SaveChangesAsync();
 
-        //    return Ok(dataLibro);
-        //}
+            return Ok();
+        }
     }
 }

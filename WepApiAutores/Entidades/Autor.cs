@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace WepApiAutores.Entidades
 {
@@ -6,7 +7,6 @@ namespace WepApiAutores.Entidades
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
-       // [JsonIgnore]
-        public List<Libros> Libros { get; set; }
+      
     }
 }
