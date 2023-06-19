@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WepApiAutores;
 
@@ -10,9 +11,10 @@ using WepApiAutores;
 namespace WepApiAutores.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230618030757_loqueseadd")]
+    partial class loqueseadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,21 +37,6 @@ namespace WepApiAutores.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Autors");
-                });
-
-            modelBuilder.Entity("WepApiAutores.Entidades.AutoresLibros", b =>
-                {
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LibrosId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AutorId", "LibrosId");
-
-                    b.HasIndex("LibrosId");
-
-                    b.ToTable("AutoresLibros");
                 });
 
             modelBuilder.Entity("WepApiAutores.Entidades.Comentario", b =>
@@ -89,25 +76,6 @@ namespace WepApiAutores.Migrations
                     b.ToTable("Libros");
                 });
 
-            modelBuilder.Entity("WepApiAutores.Entidades.AutoresLibros", b =>
-                {
-                    b.HasOne("WepApiAutores.Entidades.Autor", "Autor")
-                        .WithMany("autorLibro")
-                        .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WepApiAutores.Entidades.Libros", "Libros")
-                        .WithMany("autorLibro")
-                        .HasForeignKey("LibrosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Autor");
-
-                    b.Navigation("Libros");
-                });
-
             modelBuilder.Entity("WepApiAutores.Entidades.Comentario", b =>
                 {
                     b.HasOne("WepApiAutores.Entidades.Libros", "Libros")
@@ -119,16 +87,9 @@ namespace WepApiAutores.Migrations
                     b.Navigation("Libros");
                 });
 
-            modelBuilder.Entity("WepApiAutores.Entidades.Autor", b =>
-                {
-                    b.Navigation("autorLibro");
-                });
-
             modelBuilder.Entity("WepApiAutores.Entidades.Libros", b =>
                 {
                     b.Navigation("Comentarios");
-
-                    b.Navigation("autorLibro");
                 });
 #pragma warning restore 612, 618
         }

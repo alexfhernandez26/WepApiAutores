@@ -36,7 +36,8 @@ namespace WepApiAutores.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<LibroDto>> Get(int id)
         {
-            var dataLibro = await _context.Libros.FirstOrDefaultAsync(x => x.Id == id);
+            var dataLibro = await _context.Libros.Include(librobd => librobd.autorLibro).
+                ThenInclude(autoresLibrosDb => autoresLibrosDb.Autor).FirstOrDefaultAsync(x => x.Id == id);
 
             if (dataLibro == null)
             {
@@ -49,11 +50,17 @@ namespace WepApiAutores.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(LibroCreacionDto librosCreacionDto)
         {
-            //var existeAutor = await _context.Autors.AnyAsync(x => x.Id == libros.AutorId);
-            //if (!existeAutor)
-            //{
-            //    return NotFound($"No existe autor con el id {libros.AutorId}");
-            //}
+            if (librosCreacionDto.AutorId == null)
+            {
+                return BadRequest("No se puede insertar libro sin autor");
+            }
+            var AutoresIds = await _context.Autors.Where
+                (autorBd => librosCreacionDto.AutorId.Contains(autorBd.Id)).Select(x => x.Id).ToListAsync();
+
+            if(AutoresIds.Count != librosCreacionDto.AutorId.Count)
+            {
+                return BadRequest("uno de los ids del autor insertado no existe");
+            }
 
             var libros = _mapper.Map<Libros>(librosCreacionDto);
 

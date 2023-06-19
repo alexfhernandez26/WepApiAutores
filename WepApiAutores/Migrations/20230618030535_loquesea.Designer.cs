@@ -12,8 +12,8 @@ using WepApiAutores;
 namespace WepApiAutores.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230617152555_Initial")]
-    partial class Initial
+    [Migration("20230618030535_loquesea")]
+    partial class loquesea
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,6 +40,30 @@ namespace WepApiAutores.Migrations
                     b.ToTable("Autors");
                 });
 
+            modelBuilder.Entity("WepApiAutores.Entidades.Comentario", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<string>("Contenido")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("LibrosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("libroId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LibrosId");
+
+                    b.ToTable("Comentarios");
+                });
+
             modelBuilder.Entity("WepApiAutores.Entidades.Libros", b =>
                 {
                     b.Property<int>("Id")
@@ -48,29 +72,26 @@ namespace WepApiAutores.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AutorId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Titulo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AutorId");
-
                     b.ToTable("Libros");
+                });
+
+            modelBuilder.Entity("WepApiAutores.Entidades.Comentario", b =>
+                {
+                    b.HasOne("WepApiAutores.Entidades.Libros", "Libros")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("LibrosId");
+
+                    b.Navigation("Libros");
                 });
 
             modelBuilder.Entity("WepApiAutores.Entidades.Libros", b =>
                 {
-                    b.HasOne("WepApiAutores.Entidades.Autor", null)
-                        .WithMany("Libros")
-                        .HasForeignKey("AutorId");
-                });
-
-            modelBuilder.Entity("WepApiAutores.Entidades.Autor", b =>
-                {
-                    b.Navigation("Libros");
+                    b.Navigation("Comentarios");
                 });
 #pragma warning restore 612, 618
         }

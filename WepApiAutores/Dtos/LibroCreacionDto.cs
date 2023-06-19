@@ -3,5 +3,7 @@
     public class LibroCreacionDto
     {
         public string Titulo{ get; set; }
+
+        public List<int> AutorId { get; set; }
     }
 }
