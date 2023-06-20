@@ -34,7 +34,7 @@ namespace WepApiAutores.Controllers
             return _mapper.Map<List<LibroDto>>(dataLibro);
         }
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<LibroDto>> Get(int id)
+        public async Task<ActionResult<LibroDtoConAutores>> Get(int id)
         {
             var dataLibro = await _context.Libros.Include(librobd => librobd.autorLibro).
                 ThenInclude(autoresLibrosDb => autoresLibrosDb.Autor).FirstOrDefaultAsync(x => x.Id == id);
@@ -44,7 +44,7 @@ namespace WepApiAutores.Controllers
                 return BadRequest($"No existe ningun libro con el id {id}");
             }
 
-            return _mapper.Map<LibroDto>(dataLibro);
+            return _mapper.Map<LibroDtoConAutores>(dataLibro);
         }
 
         [HttpPost]

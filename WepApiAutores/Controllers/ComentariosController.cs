@@ -34,6 +34,7 @@ namespace WepApiAutores.Controllers
 
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Post(int libroId, ComentarioCreacionDto comentarioCreacionDto)
         {
@@ -48,6 +49,31 @@ namespace WepApiAutores.Controllers
             comentario.librosId = libroId;
             _context.Add(comentario);
             await _context.SaveChangesAsync();  
+            return Ok(comentario);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Put(int id, int libroId, ComentarioCreacionDto comentarioCreacionDto)
+        {
+            var existeLibro = await _context.Libros.AnyAsync(libroDb => libroDb.Id == libroId);
+
+            if (!existeLibro)
+            {
+                return NotFound("El libro al que le quiere actualizar el comentario no existe");
+            }
+
+            var existeComentario = await _context.Comentarios.AnyAsync(comentDb => comentDb.ID== id);
+
+            if (!existeComentario)
+            {
+                return NotFound("El coemtario no existe");
+            }
+
+            var comentario = _mapper.Map<Comentario>(comentarioCreacionDto);
+            comentario.ID = id;
+            comentario.librosId = libroId;
+            _context.Update(comentario);
+            await _context.SaveChangesAsync();
             return Ok(comentario);
         }
     }

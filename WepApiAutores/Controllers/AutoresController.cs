@@ -29,12 +29,14 @@ namespace WepApiAutores.Controllers
             return _mapper.Map<List<AutorDto>>(dataAutores);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<AutorDto>> Get(int id)
+        [HttpGet("{id:int}",Name ="obtenerAutor")]
+        public async Task<ActionResult<AutorDtoConLibros>> Get(int id)
         {
-            var dataAutores = await _context.Autors.FirstOrDefaultAsync(autorBd => autorBd.Id == id);
+            var dataAutores = await _context.Autors
+               .Include(autorBd => autorBd.autorLibro)
+               .ThenInclude(autorLibroBd => autorLibroBd.Libros).FirstOrDefaultAsync(autorBd => autorBd.Id == id);
 
-            return _mapper.Map<AutorDto>(dataAutores);
+            return _mapper.Map<AutorDtoConLibros>(dataAutores);
         }
 
         [HttpGet("name")]
@@ -56,19 +58,26 @@ namespace WepApiAutores.Controllers
             var autor = _mapper.Map<Autor>(autorCreacionDto);
             _context.Add(autor);
             await _context.SaveChangesAsync();
-            return Ok();
+
+            var autorId = _mapper.Map<AutorDto>(autor);
+            return CreatedAtRoute("obtenerAutor", new { id = autor.Id }, autorId);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(Autor autor,int id)
+        public async Task<ActionResult> Put(AutorCreacionDto autorCreacionDto,int id)
         {
-            if(autor.Id != id)
+            var existeAutor = await _context.Autors.AnyAsync(autorBd => autorBd.Id == id);
+
+            if (!existeAutor)
             {
-                return BadRequest("el id no coincide");
+                return BadRequest($"No existe autor con el id {id}");
             }
+
+            var autor = _mapper.Map<Autor>(autorCreacionDto);
+            autor.Id = id;
              _context.Update(autor);
             await _context.SaveChangesAsync();
-            return Ok(autor);
+            return Ok();
         }
 
         [HttpDelete("{id:int}")]

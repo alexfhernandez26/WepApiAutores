@@ -8,19 +8,39 @@ namespace WepApiAutores.Utilidades
         public Automapper()
         {
             CreateMap<Autor, AutorCreacionDto>().ReverseMap();
-            CreateMap<Autor, AutorDto>().ReverseMap();
+            CreateMap<AutorDto, Autor>().ReverseMap();
+            CreateMap<AutorDtoConLibros, Autor>().ReverseMap()
+                .ForMember(autorDto => autorDto.librosDto, option => option.MapFrom(MapAutordtoLibros));
 
             CreateMap<Libros,LibroCreacionDto>().ReverseMap()
                 .ForMember(libro => libro.autorLibro, options => options.MapFrom(MapAutoresIdsLibros));
-            CreateMap<LibroDto, Libros>().ReverseMap()
+            CreateMap<LibroDto, Libros>().ReverseMap();
+            CreateMap<LibroDtoConAutores, Libros>().ReverseMap()
                 .ForMember(libroDto => libroDto.Autores, option => option.MapFrom(MapLibroDtoAutores));
-                
           
             CreateMap<Comentario, ComentarioCreacionDto>().ReverseMap();
             CreateMap<Comentario, ComentarioDto>().ReverseMap();
             
         }
 
+        private List<LibroDto> MapAutordtoLibros(Autor autor, AutorDto autorDto)
+        {
+            var respuesta = new List<LibroDto>();
+
+            if(respuesta == null) { return respuesta; }
+
+            foreach (var autordata in autor.autorLibro)
+            {
+                respuesta.Add(new LibroDto
+                {
+                    Id = autordata.LibrosId,
+                    Titulo = autordata.Libros.Titulo
+                }
+                );
+            }
+
+            return respuesta;
+        }
         private List<AutorDto> MapLibroDtoAutores(Libros libros , LibroDto libroDto)
         {
             var respuesta = new List<AutorDto>();
