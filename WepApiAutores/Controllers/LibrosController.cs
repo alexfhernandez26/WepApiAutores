@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -67,6 +68,67 @@ namespace WepApiAutores.Controllers
             _context.Add(libros);
             await _context.SaveChangesAsync();
 
+            return Ok();
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, LibroCreacionDto libroCreacionDto)
+        {
+            var libroDB = await _context.Libros
+                .Include(a => a.autorLibro).FirstOrDefaultAsync(x=> x.Id == id);
+
+            if (libroDB == null)
+            {
+                return BadRequest("No existe libro");
+            }
+
+            libroDB = _mapper.Map(libroCreacionDto, libroDB);
+
+           await _context.SaveChangesAsync();
+           return Ok(libroDB);
+
+        }
+
+        [HttpPatch("{id:int}")]
+        public async Task<ActionResult> Patch(int id, JsonPatchDocument<LibroPatchDto> patchDocument)
+        {
+            if (patchDocument == null)
+            {
+                return BadRequest("Error con el formato del patch enviado");
+            }
+
+            var libroDb = await _context.Libros.FirstOrDefaultAsync(x => x.Id == id);   
+            if (libroDb == null)
+            {
+                return NotFound("No se encuentra libro con ese id");
+            }
+
+            var libroDto = _mapper.Map<LibroPatchDto>(libroDb);
+            patchDocument.ApplyTo(libroDto, ModelState);
+
+            var esValido = TryValidateModel(libroDto);
+
+            if (!esValido)
+            {
+                return BadRequest("El modelo de datos no es valido");
+            }
+
+            _mapper.Map(libroDto, libroDb);
+
+           await _context.SaveChangesAsync();
+
+            return Ok(libroDb);
+        }
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await _context.Libros.AnyAsync(x => x.Id == id);
+
+            if (!existe)
+            {
+                return NotFound("No se encuentra id");
+            }
+            _context.Remove(new Libros() { Id = id });
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }

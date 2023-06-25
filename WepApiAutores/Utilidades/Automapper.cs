@@ -17,7 +17,8 @@ namespace WepApiAutores.Utilidades
             CreateMap<LibroDto, Libros>().ReverseMap();
             CreateMap<LibroDtoConAutores, Libros>().ReverseMap()
                 .ForMember(libroDto => libroDto.Autores, option => option.MapFrom(MapLibroDtoAutores));
-          
+            CreateMap<Libros, LibroPatchDto>().ReverseMap();
+
             CreateMap<Comentario, ComentarioCreacionDto>().ReverseMap();
             CreateMap<Comentario, ComentarioDto>().ReverseMap();
             
