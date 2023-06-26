@@ -13,18 +13,22 @@ namespace WepApiAutores.Controllers
     public class CuentasController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration configuration;
 
         /*Identity nos da un conjunto de clases para realizar toda la funcionalidad de un sistema de usuarios tipico
 y eso incluye el registro de un usuario y el servicio que me permite registrar un usuario es 
 UserManager<IdentityUser> al UserManager hay que pasarle una clase que identifica a un usuario de nuestra 
 aplicacion y ese clase es IdentityUser*/
-        public CuentasController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public CuentasController(UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager , IConfiguration configuration)
         {
             this._userManager = userManager;
+            this._signInManager = signInManager;
             this.configuration = configuration;
         }
 
+        [HttpPost("Registro")]
         public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credencialesUsuario)
         {
             var usuario = new IdentityUser { UserName = credencialesUsuario.Email, Email = credencialesUsuario.Email };
@@ -39,6 +43,27 @@ aplicacion y ese clase es IdentityUser*/
             else
             {
                return BadRequest(resultado.Errors);
+            }
+        }
+
+        //login para hacer el login tenemos que utilizar una clase llamada  SignInManager
+        [HttpPost("Login")]
+        public async Task<ActionResult<RespuestaAutenticacion>> Login(CredencialesUsuario credencialesUsuario)
+        {
+            /*ya el metodo esta configurado y generara los tokens de manera corecta, pro antes recordar que nuestro
+             JWT esta firmado con una llave configuration["llavejwt"]) entonces la aplicacion va a tomar el token
+            y va a confirmar que halla sido firmado con la llave correcta para ello debemos ir a la clase program
+            y trabajar con las configuraciones de .AddJwtBearer()*/
+            var resultado = await _signInManager.PasswordSignInAsync(credencialesUsuario.Email,
+                credencialesUsuario.Password,isPersistent:false,lockoutOnFailure:false);
+
+            if (resultado.Succeeded)
+            {
+                return ConstruirToken(credencialesUsuario);
+            }
+            else
+            {
+                return BadRequest("Login incorrecto");
             }
         }
 
