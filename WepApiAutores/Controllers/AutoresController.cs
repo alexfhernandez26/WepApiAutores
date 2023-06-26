@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using WepApiAutores.Entidades;
 using AutoMapper;
 using WepApiAutores.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WepApiAutores.Controllers
 {
@@ -22,6 +24,7 @@ namespace WepApiAutores.Controllers
 
 
         [HttpGet]
+       [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<AutorDto>>> Get() 
         {
            var dataAutores =await _context.Autors.ToListAsync();
@@ -80,7 +83,7 @@ namespace WepApiAutores.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = "eliminarAutor")]
         public async Task<ActionResult> Delete(int id)
         {
             var existe = await _context.Autors.AnyAsync(x => x.Id == id);

@@ -119,6 +119,8 @@ namespace WepApiAutores.Controllers
 
             return Ok(libroDb);
         }
+
+        [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
             var existe = await _context.Libros.AnyAsync(x => x.Id == id);
